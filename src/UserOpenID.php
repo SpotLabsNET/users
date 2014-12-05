@@ -45,9 +45,11 @@ class UserOpenID {
             JOIN user_openid_identities ON users.id=user_openid_identities.user_id
             WHERE identity=? LIMIT 1");
         $q->execute(array($light->identity));
-        if ($identity = $q->fetch()) {
+        if ($user = $q->fetch()) {
           $result = new User($user);
           $result->setIdentity("openid:" . $light->identity);
+
+          return $result;
         } else {
           throw new UserAuthenticationException("No account for the OpenID identity '" . $light->identity . "' was found.");
         }

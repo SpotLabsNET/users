@@ -4,6 +4,7 @@ namespace Users;
 
 /**
  * Provides an interface to supported OAuth2 providers.
+ * TODO this could be abstracted out into component-discovery for each provider
  */
 class OAuth2Providers {
 
