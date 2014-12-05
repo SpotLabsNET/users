@@ -33,12 +33,12 @@ class User {
     if (User::$instance === null) {
       // try autologin if we don't have session variables set
       $used_auto_login = false;
-      if (!isset($_SESSION['user_id']) && !isset($_SESSION['user_key'])) {
+      if (!isset($_SESSION['user_id']) && !isset($_SESSION['user_key']) && !isset($_SESSION['no_autologin'])) {
         User::tryAutoLogin();
         $used_auto_login = true;
       }
 
-      // if it's still not set, bail
+      // if the session variables are still not set after autologin, bail
       if (!isset($_SESSION['user_id']) && !isset($_SESSION['user_key'])) {
         return User::$instance;
       }
@@ -68,6 +68,7 @@ class User {
 
     $_SESSION['user_id'] = $this->getId();
     $_SESSION['user_key'] = $user_key;
+    unset($_SESSION['no_autologin']);
 
     if ($use_cookies) {
       $_COOKIE['autologin_id'] = $this->getId();
@@ -85,6 +86,13 @@ class User {
       $_SESSION['user_id'] = $_COOKIE['autologin_id'];
       $_SESSION['user_key'] = $_COOKIE['autologin_key'];
     }
+  }
+
+  static function logout(\Db\Connection $db) {
+    unset($_SESSION['user_id']);
+    unset($_SESSION['user_key']);
+    $_SESSION['no_autologin'] = true;
+    User::$instance = null;
   }
 
   static function findUser(\Db\Connection $db, $user_id) {
