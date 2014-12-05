@@ -68,8 +68,9 @@ class User {
     }
 
     // delete old web keys
-    $q = $db->prepare("DELETE FROM user_valid_keys WHERE user_id=? AND created_at > DATE_SUB(NOW(), INTERVAL ? DAYS)");
-    $q->execute(array($this->getId(), \Openclerk\Config::get("autologin_expire_days")));
+    $days = \Openclerk\Config::get("autologin_expire_days");
+    $q = $db->prepare("DELETE FROM user_valid_keys WHERE user_id=? AND created_at < DATE_SUB(NOW(), INTERVAL $days DAY)");
+    $q->execute(array($this->getId()));
   }
 
   static function tryAutoLogin() {

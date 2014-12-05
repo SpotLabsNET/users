@@ -50,6 +50,8 @@ class UserPassword {
     // create a new password
     $q = $db->prepare("INSERT INTO user_passwords SET user_id=?, password_hash=?");
     $q->execute(array($user_id, UserPassword::hash($password)));
+
+    return true;
   }
 
   // TODO forgotten password, etc
