@@ -15,7 +15,7 @@ class UserPassword {
    */
   static function tryLogin(\Db\Connection $db, $email, $password) {
     // find the user with the email
-    $q = $db->prepare("SELECT * FROM users
+    $q = $db->prepare("SELECT users.* FROM users
         JOIN user_passwords ON users.id=user_passwords.user_id
         WHERE email=? AND password_hash=? LIMIT 1");
     $q->execute(array($email, UserPassword::hash($password)));
