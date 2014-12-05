@@ -15,6 +15,11 @@ class User {
   var $params;
 
   /**
+   * The identity used to log in currently.
+   */
+  var $identity = null;
+
+  /**
    * Construct a user instance from the given user parameters (from the database).
    */
   function __construct($params) {
@@ -92,6 +97,18 @@ class User {
 
   function getId() {
     return $this->params['id'];
+  }
+
+  function getEmail() {
+    return $this->params['email'];
+  }
+
+  function setIdentity($identity) {
+    $this->identity = $identity;
+  }
+
+  function getIdentity() {
+    return $this->identity;
   }
 
 }

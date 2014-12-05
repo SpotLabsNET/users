@@ -20,7 +20,9 @@ class UserPassword {
         WHERE email=? AND password_hash=? LIMIT 1");
     $q->execute(array($email, UserPassword::hash($password)));
     if ($user = $q->fetch()) {
-      return new User($user);
+      $result = new User($user);
+      $result->setIdentity("(password)");
+      return $result;
     } else {
       throw new UserAuthenticationException("No such email/password found");
     }
