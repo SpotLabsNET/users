@@ -14,6 +14,8 @@ class User {
 
   var $params;
 
+  var $is_auto_logged_in = false;
+
   /**
    * The identity used to log in currently.
    */
@@ -35,8 +37,10 @@ class User {
   static function getInstance(\Db\Connection $db) {
     if (User::$instance === null) {
       // try autologin if we don't have session variables set
+      $used_auto_login = false;
       if (!isset($_SESSION['user_id']) && !isset($_SESSION['user_key'])) {
         User::tryAutoLogin();
+        $used_auto_login = true;
       }
 
       // if it's still not set, bail
@@ -50,6 +54,9 @@ class User {
       if ($user = $q->fetch()) {
         // find the associated user
         User::$instance = User::findUser($db, $user['user_id']);
+        if (User::$instance) {
+          User::$instance->is_auto_logged_in = $used_auto_login;
+        }
       }
 
     }
@@ -111,4 +118,10 @@ class User {
     return $this->identity;
   }
 
+  /**
+   * Was this user logged in automatically *in this session*?
+   */
+  function isAutoLoggedIn() {
+    return $this->is_auto_logged_in;
+  }
 }
