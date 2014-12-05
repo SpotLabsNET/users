@@ -42,7 +42,7 @@ class UserOpenID {
       if ($light->validate()) {
 
         $q = $db->prepare("SELECT users.* FROM users
-            JOIN users_openid_identities ON users.id=users_openid_identities.user_id
+            JOIN user_openid_identities ON users.id=user_openid_identities.user_id
             WHERE identity=? LIMIT 1");
         $q->execute(array($light->identity));
         if ($identity = $q->fetch()) {
@@ -97,7 +97,7 @@ class UserOpenID {
 
       if ($light->validate()) {
 
-        $q = $db->prepare("SELECT * FROM users_openid_identities WHERE identity=? LIMIT 1");
+        $q = $db->prepare("SELECT * FROM user_openid_identities WHERE identity=? LIMIT 1");
         $q->execute(array($light->identity));
         if ($identity = $q->fetch()) {
           throw new UserAlreadyExistsException("An account for the OpenID identity '" . $light->identity . "' already exists.");
@@ -110,7 +110,7 @@ class UserOpenID {
         $user_id = $db->lastInsertId();
 
         // create a new password
-        $q = $db->prepare("INSERT INTO users_openid_identities SET user_id=?, identity=?");
+        $q = $db->prepare("INSERT INTO user_openid_identities SET user_id=?, identity=?");
         $q->execute(array($user_id, $light->identity));
 
         return true;
