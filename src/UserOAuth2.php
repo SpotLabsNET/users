@@ -29,8 +29,8 @@ class UserOAuth2 {
     // find the user with the uid
     $q = $db->prepare("SELECT users.* FROM users
         JOIN user_oauth2_identities ON users.id=user_oauth2_identities.user_id
-        WHERE uid=? AND password_hash=? LIMIT 1");
-    $q->execute(array($uid, UserPassword::hash($password)));
+        WHERE uid=? AND provider=? LIMIT 1");
+    $q->execute(array($uid, $provider->getKey()));
 
     if ($user = $q->fetch()) {
       $result = new User($user);
