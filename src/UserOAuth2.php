@@ -34,10 +34,10 @@ class UserOAuth2 {
 
     if ($user = $q->fetch()) {
       $result = new User($user);
-      $result->setIdentity("google:" . $uid);
+      $result->setIdentity($provider->getKey() . ":" . $uid);
       return $result;
     } else {
-      throw new UserAuthenticationException("No such email/password found");
+      throw new UserAuthenticationException("No such " . $provider->getKey() . " user found");
     }
   }
 
