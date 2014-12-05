@@ -17,11 +17,6 @@ class User {
   var $is_auto_logged_in = false;
 
   /**
-   * The identity used to log in currently.
-   */
-  var $identity = null;
-
-  /**
    * Construct a user instance from the given user parameters (from the database).
    */
   function __construct($params) {
@@ -111,11 +106,15 @@ class User {
   }
 
   function setIdentity($identity) {
-    $this->identity = $identity;
+    $_SESSION['user_identity'] = $identity;
   }
 
+  /**
+   * Get the identity used to log in this user; persists across requests
+   * as it is stored in session.
+   */
   function getIdentity() {
-    return $this->identity;
+    return $_SESSION['user_identity'];
   }
 
   /**
