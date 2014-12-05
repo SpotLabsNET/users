@@ -24,7 +24,7 @@ abstract class UserOAuth2 {
    * @throws UserAuthenticationException if the user could not be logged in, with a reason
    */
   static function tryLogin(\Db\Connection $db, $redirect) {
-    $provider = $this->getProvider($redirect);
+    $provider = static::getProvider($redirect);
 
     if (!require_get("code", false)) {
       user_redirect($provider->getAuthorizationUrl());
