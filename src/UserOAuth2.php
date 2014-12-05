@@ -6,15 +6,7 @@ namespace Users;
  * Allows users to be logged in with OAuth2.
  * Based on https://github.com/thephpleague/oauth2-client
  */
-abstract class UserOAuth2 {
-
-  /**
-   * Get the {@link League\OAuth2\Client\Provider\Provider} for this
-   * authentication handler.
-   *
-   * @param $redirect the registered redirect URI
-   */
-  abstract function getProvider($redirect);
+class UserOAuth2 {
 
   /**
    * Try logging in as a user with the given email and password.
@@ -23,9 +15,7 @@ abstract class UserOAuth2 {
    * @return a valid {@link User}
    * @throws UserAuthenticationException if the user could not be logged in, with a reason
    */
-  static function tryLogin(\Db\Connection $db, $redirect) {
-    $provider = static::getProvider($redirect);
-
+  static function tryLogin(\Db\Connection $db, $provider) {
     if (!require_get("code", false)) {
       user_redirect($provider->getAuthorizationUrl());
       return;
