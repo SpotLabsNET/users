@@ -12,8 +12,8 @@ class UserPassword extends \Db\Migration {
     $q = $db->prepare("CREATE TABLE user_passwords (
       id int not null auto_increment primary key,
       created_at timestamp not null default current_timestamp,
-      user_id int not null,
 
+      user_id int not null,
       password_hash varchar(64) not null,
 
       INDEX(user_id)

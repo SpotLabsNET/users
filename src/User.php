@@ -40,7 +40,7 @@ class User {
       }
 
       // now try to find the valid user
-      $q = $db->prepare("SELECT * FROM valid_user_keys WHERE user_id=? AND user_key=? LIMIT 1");
+      $q = $db->prepare("SELECT * FROM user_valid_keys WHERE user_id=? AND user_key=? LIMIT 1");
       $q->execute(array($_SESSION['user_id'], $_SESSION['user_key']));
       if ($user = $q->fetch()) {
         // find the associated user
@@ -56,7 +56,7 @@ class User {
     $user_key = sprintf("%04x%04x%04x%04x", rand(0,0xffff), rand(0,0xffff), rand(0,0xffff), rand(0,0xffff));
 
     // create a new valid user key
-    $q = $db->prepare("INSERT INTO valid_user_keys SET user_id=?, user_key=?");
+    $q = $db->prepare("INSERT INTO user_valid_keys SET user_id=?, user_key=?");
     $q->execute(array($this->getId(), $user_key));
 
     $_SESSION['user_id'] = $this->getId();
@@ -68,7 +68,7 @@ class User {
     }
 
     // delete old web keys
-    $q = $db->prepare("DELETE FROM valid_user_keys WHERE user_id=? AND created_at > DATE_SUB(NOW(), INTERVAL ? DAYS)");
+    $q = $db->prepare("DELETE FROM user_valid_keys WHERE user_id=? AND created_at > DATE_SUB(NOW(), INTERVAL ? DAYS)");
     $q->execute(array($this->getId(), \Openclerk\Config::get("autologin_expire_days")));
   }
 

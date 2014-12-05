@@ -17,7 +17,7 @@ class UserPassword {
 
     // find the user with the email
     $q = $db->prepare("SELECT * FROM users
-        JOIN user_passwords ON user.id=user_passwords.user_id
+        JOIN user_passwords ON users.id=user_passwords.user_id
         WHERE email=? AND password_hash=? LIMIT 1");
     $q->execute(array($email, $hash));
     if ($user = $q->fetch()) {
