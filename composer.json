@@ -3,6 +3,7 @@
   "require": {
     "openclerk/db": "dev-master",
     "openclerk/config": "dev-master",
+    "soundasleep/php-helpers": "dev-master",
     "league/oauth2-client": "~0.6"
   },
   "autoload": {
