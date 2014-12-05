@@ -20,7 +20,7 @@ class UserOpenID {
       throw new UserSignupException("That is not a valid OpenID identity.");
     }
 
-    $light = new LightOpenID(\Openclerk\Config::get("openid_host"));
+    $light = new \LightOpenID(\Openclerk\Config::get("openid_host"));
 
     if (!$light->mode) {
       // we still need to authenticate
@@ -76,7 +76,7 @@ class UserOpenID {
       throw new UserAlreadyExistsException("That email is already in use");
     }
 
-    $light = new LightOpenID(\Openclerk\Config::get("openid_host"));
+    $light = new \LightOpenID(\Openclerk\Config::get("openid_host"));
 
     if (!$light->mode) {
       // we still need to authenticate
