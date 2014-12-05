@@ -1,0 +1,12 @@
+{
+  "name": "openclerk/users",
+  "require": {
+    "openclerk/db": "dev-master",
+    "openclerk/config": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "Users\\": "src"
+    }
+  }
+}
