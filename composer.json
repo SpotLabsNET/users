@@ -4,7 +4,8 @@
     "openclerk/db": "dev-master",
     "openclerk/config": "dev-master",
     "soundasleep/php-helpers": "dev-master",
-    "league/oauth2-client": "~0.6"
+    "league/oauth2-client": "~0.6",
+    "lightopenid/lightopenid": "dev-master"
   },
   "autoload": {
     "psr-4": {
