@@ -71,6 +71,10 @@ class UserOpenID {
       throw new UserSignupException("That is not a valid OpenID identity.");
     }
 
+    if (!is_valid_email($email)) {
+      throw new UserSignupException("That is not a valid email.");
+    }
+
     // does a user already exist with this email?
     $q = $db->prepare("SELECT * FROM users WHERE email=? LIMIT 1");
     $q->execute(array($email));

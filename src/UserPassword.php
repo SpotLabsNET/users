@@ -29,7 +29,7 @@ class UserPassword {
   }
 
   static function hash($password) {
-    return md5(\Openclerk\Config::get("user_password_salt") . $password);;
+    return md5(\Openclerk\Config::get("user_password_salt") . $password);
   }
 
   /**
@@ -37,6 +37,10 @@ class UserPassword {
    * @throws UserAlreadyExistsException if the user already exists in the database
    */
   static function trySignup(\Db\Connection $db, $email, $password) {
+    if (!is_valid_email($email)) {
+      throw new UserSignupException("That is not a valid email.");
+    }
+
     // does a user already exist with this email?
     $q = $db->prepare("SELECT * FROM users WHERE email=? LIMIT 1");
     $q->execute(array($email));
