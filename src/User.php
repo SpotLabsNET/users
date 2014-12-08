@@ -31,6 +31,10 @@ class User {
    */
   static function getInstance(\Db\Connection $db) {
     if (User::$instance === null) {
+      if (session_status() === PHP_SESSION_NONE) {
+        throw new UserStatusException("Session needs to be started before requesting User instance");
+      }
+
       // try autologin if we don't have session variables set
       $used_auto_login = false;
       if (!isset($_SESSION['user_id']) && !isset($_SESSION['user_key']) && !isset($_SESSION['no_autologin'])) {
@@ -91,6 +95,7 @@ class User {
   static function logout(\Db\Connection $db) {
     unset($_SESSION['user_id']);
     unset($_SESSION['user_key']);
+    unset($_SESSION['user_identity']);
     $_SESSION['no_autologin'] = true;
     User::$instance = null;
   }
