@@ -23,6 +23,10 @@ class User {
     $this->params = $params;
   }
 
+  function __toString() {
+    return "[User " . $this->getId() . ", " . $this->getEmail() . ", " . $this->getIdentity() . "]";
+  }
+
   /**
    * Get the current logged in user instance, or {@code null} if
    * there is none, based on session variables.
