@@ -32,6 +32,11 @@ if ($migrations->hasPending(db())) {
 }
 ```
 
+## Features
+
+1. Automatic session management
+1. Autologin
+
 ## Using
 
 This project uses [openclerk/db](https://github.com/openclerk/db) for database
@@ -54,6 +59,17 @@ session_start();
 You can now register and login users using a variety of authentication methods.
 The component assumes that only one user can own any one email address, and that
 all users need to define an email address as their primary key.
+
+```php
+// get current user
+$user = Users\User::getInstance(db());
+
+// logout any current user
+Users\User::logout(db());
+
+// get a user instance
+$user = Users\User::findUser(db(), $user_id);
+```
 
 ### Password
 
@@ -125,3 +141,4 @@ More OAuth2 providers provided by default will be coming soon.
 1. Remove requirement for email primary key
 1. Tests
 1. Publish on Packagist
+1. Documentation on adding additional user parameters
