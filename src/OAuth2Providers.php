@@ -25,7 +25,7 @@ class OAuth2Providers {
   }
 
   /**
-   * Get the {@link League\OAuth2\Client\Provider\Provider} for this
+   * Get the {@link League\OAuth2\Client\Provider\Provider} for the Google
    * authentication handler.
    */
   static function google($redirect) {
