@@ -12,11 +12,11 @@ and run `composer update` to install it into your project:
 ```json
 {
   "require": {
-    "openclerk/db": "dev-master"
+    "openclerk/users": "dev-master"
   },
   "repositories": [{
     "type": "vcs",
-    "url": "https://github.com/openclerk/db"
+    "url": "https://github.com/openclerk/users"
   }]
 }
 ```
