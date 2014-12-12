@@ -14,6 +14,10 @@ class UserPassword {
    * @throws UserAuthenticationException if the user could not be logged in, with a reason
    */
   static function tryLogin(\Db\Connection $db, $email, $password) {
+    if ($email === null) {
+      throw new UserAuthenticationException("Email required for password login");
+    }
+
     // find the user with the email
     $q = $db->prepare("SELECT users.* FROM users
         JOIN user_passwords ON users.id=user_passwords.user_id
@@ -37,6 +41,10 @@ class UserPassword {
    * @throws UserAlreadyExistsException if the user already exists in the database
    */
   static function trySignup(\Db\Connection $db, $email, $password) {
+    if ($email === null) {
+      throw new UserAuthenticationException("Email required for password signup");
+    }
+
     if (!is_valid_email($email)) {
       throw new UserSignupException("That is not a valid email.");
     }

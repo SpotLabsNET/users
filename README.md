@@ -36,6 +36,7 @@ if ($migrations->hasPending(db())) {
 
 1. Automatic session management
 1. Autologin
+1. Optionally require emails for all non-password users with `users_require_email` config parameter
 
 ## Using
 
@@ -46,6 +47,7 @@ First configure the component with site-specific values:
 
 ```php
 Openclerk\Config::merge(array(
+  "users_require_email" => false,
   "user_password_salt" => "abc123",
   "autologin_expire_days" => 30,
   "openid_host" => "localhost",
@@ -75,13 +77,13 @@ $user = Users\User::findUser(db(), $user_id);
 
 ```php
 // signup
-$user = Users\UserPassword::trySignup(db(), $email, $password);
+$user = Users\UserPassword::trySignup(db(), $email /* may not be null */, $password);
 if ($user) {
   echo "<h2>Signed up successfully</h2>";
 }
 
 // login
-$user = Users\UserPassword::tryLogin(db(), $email, $password);
+$user = Users\UserPassword::tryLogin(db(), $email /* may not be null */, $password);
 if ($user) {
   echo "<h2>Logged in successfully as $user</h2>";
   $user->persist(db());
@@ -95,7 +97,7 @@ URL as the current script.
 
 ```php
 // signup
-$user = Users\UserOpenID::trySignup(db(), $email, $openid, "http://localhost/register.php");
+$user = Users\UserOpenID::trySignup(db(), $email /* may be null */, $openid, "http://localhost/register.php");
 if ($user) {
   echo "<h2>Signed up successfully</h2>";
 }
@@ -138,7 +140,9 @@ More OAuth2 providers provided by default will be coming soon.
 
 ## TODO
 
-1. Remove requirement for email primary key
+1. Track last_login
+1. Forgotten password
+1. Add and remove identities
 1. Tests
 1. Publish on Packagist
 1. Documentation on adding additional user parameters

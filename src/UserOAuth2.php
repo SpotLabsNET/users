@@ -72,20 +72,27 @@ class UserOAuth2 {
     }
 
     $email = $user->email;
-    if (!$email) {
-      throw new UserSignupException("No email address found");
+    if ($email || \Openclerk\Config::get('users_require_email', false)) {
+      if (!$email) {
+        throw new UserSignupException("No email address found");
+      }
+
+      if (!is_valid_email($email)) {
+        throw new UserSignupException("That is not a valid email.");
+      }
+
+      // does a user already exist with this email?
+      $q = $db->prepare("SELECT * FROM users WHERE email=? LIMIT 1");
+      $q->execute(array($email));
+      if ($q->fetch()) {
+        throw new UserAlreadyExistsException("That email is already in use");
+      }
+
     }
 
     $uid = $user->uid;
     if (!$uid) {
       throw new UserSignupException("No UID found");
-    }
-
-    // does a user already exist with this email?
-    $q = $db->prepare("SELECT * FROM users WHERE email=? LIMIT 1");
-    $q->execute(array($email));
-    if ($q->fetch()) {
-      throw new UserAlreadyExistsException("That email is already in use");
     }
 
     // create a new user

@@ -71,15 +71,17 @@ class UserOpenID {
       throw new UserSignupException("That is not a valid OpenID identity.");
     }
 
-    if (!is_valid_email($email)) {
-      throw new UserSignupException("That is not a valid email.");
-    }
+    if ($email || \Openclerk\Config::get('users_require_email', false)) {
+      if (!is_valid_email($email)) {
+        throw new UserSignupException("That is not a valid email.");
+      }
 
-    // does a user already exist with this email?
-    $q = $db->prepare("SELECT * FROM users WHERE email=? LIMIT 1");
-    $q->execute(array($email));
-    if ($q->fetch()) {
-      throw new UserAlreadyExistsException("That email is already in use");
+      // does a user already exist with this email?
+      $q = $db->prepare("SELECT * FROM users WHERE email=? LIMIT 1");
+      $q->execute(array($email));
+      if ($q->fetch()) {
+        throw new UserAlreadyExistsException("That email is already in use");
+      }
     }
 
     $light = new \LightOpenID(\Openclerk\Config::get("openid_host"));
