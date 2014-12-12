@@ -63,25 +63,13 @@ class UserOpenID {
   }
 
   /**
-   * @throws UserSignupException if the user could not be signed up, with a reason
-   * @throws UserAlreadyExistsException if the user already exists in the database
+   * Try do OpenID validation (with the given redirect).
+   * @return the validated LightOpenID object on success
+   * @throws UserSignupException if anything bad happened
    */
-  static function trySignup(\Db\Connection $db, $email, $openid, $redirect) {
+  static function validateOpenID($openid, $redirect) {
     if (!is_valid_url($openid)) {
       throw new UserSignupException("That is not a valid OpenID identity.");
-    }
-
-    if ($email || \Openclerk\Config::get('users_require_email', false)) {
-      if (!is_valid_email($email)) {
-        throw new UserSignupException("That is not a valid email.");
-      }
-
-      // does a user already exist with this email?
-      $q = $db->prepare("SELECT * FROM users WHERE email=? LIMIT 1");
-      $q->execute(array($email));
-      if ($q->fetch()) {
-        throw new UserAlreadyExistsException("That email is already in use");
-      }
     }
 
     $light = new \LightOpenID(\Openclerk\Config::get("openid_host"));
@@ -104,30 +92,77 @@ class UserOpenID {
       // TODO check heavy requests
 
       if ($light->validate()) {
-
-        $q = $db->prepare("SELECT * FROM user_openid_identities WHERE identity=? LIMIT 1");
-        $q->execute(array($light->identity));
-        if ($identity = $q->fetch()) {
-          throw new UserAlreadyExistsException("An account for the OpenID identity '" . $light->identity . "' already exists.");
-        }
-
-        // otherwise create a new account
-        // create a new user
-        $q = $db->prepare("INSERT INTO users SET email=?");
-        $q->execute(array($email));
-        $user_id = $db->lastInsertId();
-
-        // create a new password
-        $q = $db->prepare("INSERT INTO user_openid_identities SET user_id=?, identity=?");
-        $q->execute(array($user_id, $light->identity));
-
-        return true;
-
+        return $light;
       } else {
         $error = $light->validate_error ? $light->validate_error : "Please try again.";
         throw new UserSignupException("OpenID validation was not successful: " . $error);
       }
     }
+  }
+
+  /**
+   * @throws UserSignupException if the user could not be signed up, with a reason
+   * @throws UserAlreadyExistsException if the identity or email already exists in the database
+   */
+  static function trySignup(\Db\Connection $db, $email, $openid, $redirect) {
+    if ($email || \Openclerk\Config::get('users_require_email', false)) {
+      if (!is_valid_email($email)) {
+        throw new UserSignupException("That is not a valid email.");
+      }
+
+      // does a user already exist with this email?
+      $q = $db->prepare("SELECT * FROM users WHERE email=? LIMIT 1");
+      $q->execute(array($email));
+      if ($q->fetch()) {
+        throw new UserAlreadyExistsException("That email is already in use");
+      }
+    }
+
+    $light = self::validateOpenID($openid, $redirect);
+
+    // search for existing identities
+    $q = $db->prepare("SELECT * FROM user_openid_identities WHERE identity=? LIMIT 1");
+    $q->execute(array($light->identity));
+    if ($identity = $q->fetch()) {
+      throw new UserAlreadyExistsException("An account for the OpenID identity '" . $light->identity . "' already exists.");
+    }
+
+    // otherwise create a new account
+    // create a new user
+    $q = $db->prepare("INSERT INTO users SET email=?");
+    $q->execute(array($email));
+    $user_id = $db->lastInsertId();
+
+    // create a new identity
+    $q = $db->prepare("INSERT INTO user_openid_identities SET user_id=?, identity=?");
+    $q->execute(array($user_id, $light->identity));
+
+    return true;
+  }
+
+  /**
+   * @throws UserSignupException if the user could not be signed up, with a reason
+   * @throws UserAlreadyExistsException if the identity already exists in the database
+   */
+  static function addIdentity(\Db\Connection $db, User $user, $openid, $redirect) {
+    if (!$user) {
+      throw new \InvalidArgumentException("No user provided");
+    }
+
+    $light = self::validateOpenID($openid, $redirect);
+
+    // search for existing identities
+    $q = $db->prepare("SELECT * FROM user_openid_identities WHERE identity=? LIMIT 1");
+    $q->execute(array($light->identity));
+    if ($identity = $q->fetch()) {
+      throw new UserAlreadyExistsException("An account for the OpenID identity '" . $light->identity . "' already exists.");
+    }
+
+    // create a new identity
+    $q = $db->prepare("INSERT INTO user_openid_identities SET user_id=?, identity=?");
+    $q->execute(array($user->getId(), $light->identity));
+
+    return true;
   }
 
 }

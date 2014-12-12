@@ -38,6 +38,7 @@ if ($migrations->hasPending(db())) {
 1. Autologin
 1. Optionally require emails for all non-password users with `users_require_email` config parameter
 1. Forgot password/reset password functionality
+1. Users can optionally have multiple OpenID/OAuth2 identities and one password associated with an account
 
 ## Using
 
@@ -96,6 +97,10 @@ echo "Secret = $secret\n";
 
 // complete forgot password
 Users\UserPassword::completePasswordReset(db(), $email, $secret, $new_password);
+
+// add password to existing user
+$user = Users\User::getInstance(db());
+$result = Users\UserPassword::addPassword(db(), $user, $password);
 ```
 
 ### OpenID
@@ -116,6 +121,10 @@ if ($user) {
   echo "<h2>Logged in successfully as $user</h2>";
   $user->persist(db());
 }
+
+// add identity to existing user
+$user = Users\User::getInstance(db());
+$result = Users\UserOpenID::addIdentity(db(), $user, $openid, "http://localhost/add.php");
 ```
 
 ### OAuth2
@@ -137,11 +146,15 @@ if ($user) {
 }
 
 // login
-$user = Users\UserOAuth2::tryLogin(db(), Users\OAuth2Providers::google("http://localhost/openclerk2/login-oauth2.php"));
+$user = Users\UserOAuth2::tryLogin(db(), Users\OAuth2Providers::google("http://localhost/login.php"));
 if ($user) {
   echo "<h2>Logged in successfully as $user</h2>";
   $user->persist(db());
 }
+
+// add identity to existing user
+$user = Users\User::getInstance(db());
+$result = Users\UserOAuth2::addIdentity(db(), $user, Users\OAuth2Providers::google("http://localhost/add.php"));
 ```
 
 More OAuth2 providers provided by default will be coming soon.
@@ -149,8 +162,10 @@ More OAuth2 providers provided by default will be coming soon.
 ## TODO
 
 1. Track last_login
-1. Add and remove identities
+1. Removing identities
 1. Tests
 1. Publish on Packagist
 1. Add user names, other user properties
 1. Documentation on adding additional user parameters
+1. Documentation on autologin with cookies
+1. How to add, change, remove email addresses

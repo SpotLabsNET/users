@@ -140,4 +140,24 @@ class User {
   function isAutoLoggedIn() {
     return $this->is_auto_logged_in;
   }
+
+  /**
+   * Delete the given user. Triggers a 'user_deleted' event with the
+   * current user parameters as an argument.
+   */
+  function delete(\Db\Connection $db) {
+    // delete all possible identities
+    $q = $db->prepare("DELETE FROM user_passwords WHERE user_id=?");
+    $q->execute(array($this->getId()));
+    $q = $db->prepare("DELETE FROM user_openid_identities WHERE user_id=?");
+    $q->execute(array($this->getId()));
+    $q = $db->prepare("DELETE FROM user_oauth2_identities WHERE user_id=?");
+    $q->execute(array($this->getId()));
+    $q = $db->prepare("DELETE FROM user_valid_keys WHERE user_id=?");
+    $q->execute(array($this->getId()));
+    $q = $db->prepare("DELETE FROM users WHERE id=?");
+    $q->execute(array($this->getId()));
+
+    \Openclerk\Events::trigger('user_deleted', $this->params);
+  }
 }

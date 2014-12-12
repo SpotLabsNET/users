@@ -145,6 +145,39 @@ class UserPassword {
     }
   }
 
+  /**
+   * Add a password to the given account.
+   * @throws UserSignupException if the user could not be signed up, with a reason
+   * @throws UserAlreadyExistsException if the password already exists in the database
+   */
+  static function addPassword(\Db\Connection $db, User $user, $password) {
+    if (!$user) {
+      throw new \InvalidArgumentException("No user provided");
+    }
+
+    // does such a password already exist?
+    $q = $db->prepare("SELECT * FROM user_passwords WHERE user_id=? LIMIT 1");
+    $q->execute(array($user->getId()));
+    if ($q->fetch()) {
+      throw new UserAlreadyExistsException("That account already has a password");
+    }
+
+    // does the user have an email? required
+    $email = $user->getEmail();
+    if (!$email) {
+      throw new UserSignupException("That account requires an email address to add a password");
+    } else if (!is_valid_email($email)) {
+      throw new UserSignupException("That is not a valid email");
+    }
+
+    // create a new password
+    $q = $db->prepare("INSERT INTO user_passwords SET user_id=?, password_hash=?");
+    $q->execute(array($user->getId(), UserPassword::hash($password)));
+
+    return true;
+  }
+
+
   // TODO forgotten password, etc
 
 }
