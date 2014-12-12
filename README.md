@@ -50,6 +50,7 @@ First configure the component with site-specific values:
 ```php
 Openclerk\Config::merge(array(
   "users_require_email" => false,
+  "user_password_reset_expiry" => "3 days",
   "user_password_salt" => "abc123",
   "autologin_expire_days" => 30,
   "openid_host" => "localhost",
