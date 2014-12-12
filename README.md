@@ -37,6 +37,7 @@ if ($migrations->hasPending(db())) {
 1. Automatic session management
 1. Autologin
 1. Optionally require emails for all non-password users with `users_require_email` config parameter
+1. Forgot password/reset password functionality
 
 ## Using
 
@@ -88,6 +89,13 @@ if ($user) {
   echo "<h2>Logged in successfully as $user</h2>";
   $user->persist(db());
 }
+
+// forgot password
+$secret = Users\UserPassword::forgottenPassword(db(), $email);
+echo "Secret = $secret\n";
+
+// complete forgot password
+Users\UserPassword::completePasswordReset(db(), $email, $secret, $new_password);
 ```
 
 ### OpenID
@@ -141,8 +149,8 @@ More OAuth2 providers provided by default will be coming soon.
 ## TODO
 
 1. Track last_login
-1. Forgotten password
 1. Add and remove identities
 1. Tests
 1. Publish on Packagist
+1. Add user names, other user properties
 1. Documentation on adding additional user parameters

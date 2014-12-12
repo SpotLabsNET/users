@@ -46,7 +46,7 @@ class UserPassword {
     }
 
     if (!is_valid_email($email)) {
-      throw new UserSignupException("That is not a valid email.");
+      throw new UserAuthenticationException("That is not a valid email");
     }
 
     // does a user already exist with this email?
@@ -66,6 +66,83 @@ class UserPassword {
     $q->execute(array($user_id, UserPassword::hash($password)));
 
     return true;
+  }
+
+  /**
+   * @throws UserPasswordException if something went wrong
+   */
+  static function getPasswordUser(\Db\Connection $db, $email) {
+    if ($email === null) {
+      throw new UserPasswordException("Email required");
+    }
+
+    if (!is_valid_email($email)) {
+      throw new UserPasswordException("That is not a valid email");
+    }
+
+    // does a user exist for this email?
+    $q = $db->prepare("SELECT * FROM users WHERE email=? LIMIT 1");
+    $q->execute(array($email));
+    $user = $q->fetch();
+    if (!$user) {
+      throw new UserPasswordException("No such account exists");
+    }
+
+    // is there a password user?
+    $q = $db->prepare("SELECT * FROM user_passwords WHERE user_id=?");
+    $q->execute(array($user['id']));
+    $user_password = $q->fetch();
+    if (!$user_password) {
+      throw new UserPasswordException("That account does not have an associated password");
+    }
+
+    return $user;
+  }
+
+  /**
+   * Create a forgotten password secret which is stored in the database.
+   * This will return a secret which must then be passed along with the mail to {@link completePasswordReset()}
+   * in order to reset the password.
+   * It is up to the application to send the appropriate email/etc.
+   *
+   * @throws UserPasswordException if something went wrong
+   */
+  static function forgottenPassword(\Db\Connection $db, $email) {
+    $user = self::getPasswordUser($db, $email);
+
+    $secret = random16(32);
+
+    $q = $db->prepare("UPDATE user_passwords SET reset_password_secret=?, reset_password_requested=NOW() WHERE user_id=?");
+    $q->execute(array($secret, $user['id']));
+
+    return $secret;
+  }
+
+  /**
+   * @throws UserPasswordException if something went wrong
+   */
+  static function completePasswordReset(\Db\Connection $db, $email, $secret, $new_password) {
+    $user = self::getPasswordUser($db, $email);
+
+    if (!$secret) {
+      throw new UserPasswordException("No secret supplied");
+    }
+
+    $q = $db->prepare("SELECT * FROM user_passwords WHERE user_id=?");
+    $q->execute(array($user['id']));
+    $user_password = $q->fetch();
+
+    if ($user_password['reset_password_secret'] === $secret) {
+      if (strtotime('-' . \Openclerk\Config::get('user_password_reset_expiry')) < strtotime($user_password['reset_password_requested'])) {
+        $q = $db->prepare("UPDATE user_passwords SET reset_password_secret=NULL, password_hash=? WHERE user_id=?");
+        $q->execute(array(UserPassword::hash($new_password), $user['id']));
+        return true;
+      } else {
+        throw new UserPasswordException("Password request has expired");
+      }
+    } else {
+      throw new UserPasswordException("Incorrect password reset secret");
+    }
   }
 
   // TODO forgotten password, etc

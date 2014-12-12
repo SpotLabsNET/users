@@ -1,7 +1,7 @@
 {
   "\\Users\\Migrations\\UserNoEmailsRequired": "\\Users\\Migrations\\UserNoEmailsRequired",
   "\\Users\\Migrations\\UserValidKeys": "\\Users\\Migrations\\UserValidKeys",
-  "\\Users\\Migrations\\UserPassword": "\\Users\\Migrations\\UserPassword",
+  "\\Users\\Migrations\\UserPasswordsReset": "\\Users\\Migrations\\UserPasswordsReset",
   "\\Users\\Migrations\\UserOAuth2Identities": "\\Users\\Migrations\\UserOAuth2Identities",
   "\\Users\\Migrations\\UserOpenIDIdentities": "\\Users\\Migrations\\UserOpenIDIdentities"
 }
