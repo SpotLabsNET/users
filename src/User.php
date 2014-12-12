@@ -143,7 +143,7 @@ class User {
 
   /**
    * Delete the given user. Triggers a 'user_deleted' event with the
-   * current user parameters as an argument.
+   * current user as an argument.
    */
   function delete(\Db\Connection $db) {
     // delete all possible identities
@@ -158,6 +158,6 @@ class User {
     $q = $db->prepare("DELETE FROM users WHERE id=?");
     $q->execute(array($this->getId()));
 
-    \Openclerk\Events::trigger('user_deleted', $this->params);
+    \Openclerk\Events::trigger('user_deleted', $this);
   }
 }
