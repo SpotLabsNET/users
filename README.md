@@ -160,6 +160,26 @@ $result = Users\UserOAuth2::addIdentity(db(), $user, Users\OAuth2Providers::goog
 
 More OAuth2 providers provided by default will be coming soon.
 
+## Events
+
+#### openid_validate
+
+Triggered when OpenID validation occurs, after the user has returned with an OpenID mode.
+If any event returns `false`, OpenID validation will be cancelled.
+
+Event parameter: $light object
+
+#### oauth2_auth
+
+Triggered when OpenID authentication occurs, after the user has returned with an OAuth2 code.
+If any event returns `false`, OpenID validation will be cancelled.
+
+Event parameter: $provider object
+
+#### user_deleted
+
+Triggered when a user is deleted through `User::delete()`.
+
 ## TODO
 
 1. Track last_login
@@ -170,3 +190,4 @@ More OAuth2 providers provided by default will be coming soon.
 1. Documentation on adding additional user parameters
 1. Documentation on autologin with cookies
 1. How to add, change, remove email addresses
+1. More events

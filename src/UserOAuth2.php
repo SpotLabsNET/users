@@ -49,6 +49,11 @@ class UserOAuth2 {
       redirect($provider->getAuthorizationUrl());
       return false;
     } else {
+      // optionally check for abuse etc
+      if (!\Openclerk\Events::trigger('oauth2_auth', $provider)) {
+        throw new UserAuthenticationException("Login was cancelled by the system");
+      }
+
       $token = $provider->getAccessToken('authorization_code', array(
         'code' => require_get("code"),
       ));

@@ -37,7 +37,10 @@ class UserOpenID {
     } else {
       // otherwise login as necessary
 
-      // TODO check heavy requests
+      // optionally check for abuse etc
+      if (!\Openclerk\Events::trigger('openid_validate', $light)) {
+        throw new UserAuthenticationException("Login was cancelled");
+      }
 
       if ($light->validate()) {
 
@@ -89,7 +92,10 @@ class UserOpenID {
     } else {
       // otherwise login as necessary
 
-      // TODO check heavy requests
+      // optionally check for abuse etc
+      if (!\Openclerk\Events::trigger('openid_validate', $light)) {
+        throw new UserSignupException("Login was cancelled by the system");
+      }
 
       if ($light->validate()) {
         return $light;
