@@ -56,6 +56,8 @@ Openclerk\Config::merge(array(
   "openid_host" => "localhost",
   "oauth2_google_client_id" => "abc123.apps.googleusercontent.com",
   "oauth2_google_client_secret" => "abc123",
+  "oauth2_facebook_app_id" => "1234567",
+  "oauth2_facebook_app_secret" => "abc123",
 ));
 
 session_start();
@@ -130,7 +132,7 @@ $result = Users\UserOpenID::addIdentity(db(), $user, $openid, "http://localhost/
 
 ### OAuth2
 
-For Google OAuth2, login to your [Google Developers Console](https://console.developers.google.com/project),
+For **Google OAuth2**, login to your [Google Developers Console](https://console.developers.google.com/project),
 create a new Project, and visit *APIs & Auth*:
 
 1. *APIs:* Enable _Contacts API_ and _Google+ API_
@@ -138,6 +140,9 @@ create a new Project, and visit *APIs & Auth*:
 2. *Credentials:* create a new _Client ID_ of type web applicaton, setting your permissible _Redirect URI_ to the
    login and redirect URLs used in your application. Use the generated _Client ID_ and _Client Secret_ in your
    site configuration (above).
+
+For **Facebook OAuth2**, login to your [Facebook Developers Console](https://developers.facebook.com/apps/),
+create a new App, and visit the Dashboard page for this app to get your _App ID_ and _App Secret_.
 
 ```php
 // signup
@@ -157,6 +162,7 @@ if ($user) {
 $user = Users\User::getInstance(db());
 $result = Users\UserOAuth2::addIdentity(db(), $user, Users\OAuth2Providers::google("http://localhost/add.php"));
 ```
+
 
 More OAuth2 providers provided by default will be coming soon.
 

@@ -41,6 +41,21 @@ class OAuth2Providers {
   }
 
   /**
+   * Get the {@link OAuth2Providers} for the Facebook
+   * authentication handler.
+   *
+   * @param $redirect the `redirectUri` to provide the provider.
+   * @return A {@link OAuth2Providers}
+   */
+  static function facebook($redirect) {
+    if (!$redirect) {
+      throw new \InvalidArgumentException("No redirect provided.");
+    }
+
+    return new OAuth2Providers('facebook', OAuth2Providers::loadProvider("facebook", $redirect));
+  }
+
+  /**
    * Load the {@link ProviderInterface} with the given key, from {@link #getProviders()}.
    *
    * @param $redirect the `redirectUri` to provide the provider.
@@ -61,6 +76,14 @@ class OAuth2Providers {
           'openid.realm' => \Openclerk\Config::get('openid_host'),
         ));
 
+      case "facebook":
+        return new \League\OAuth2\Client\Provider\Facebook(array(
+          'clientId' =>\Openclerk\Config::get("oauth2_facebook_app_id"),
+          'clientSecret' => \Openclerk\Config::get("oauth2_facebook_app_secret"),
+          'redirectUri' => $redirect,
+          'scopes' => array('email'),
+        ));
+
       default:
         throw new UserAuthenticationException("No such known OAuth2 provider '$key'");
     }
@@ -73,6 +96,8 @@ class OAuth2Providers {
     switch ($key) {
       case "google":
         return self::google($redirect);
+      case "facebook":
+        return self::facebook($redirect);
 
       break;
         throw new UserAuthenticationException("No such known OAuth2 provider '$key'");
@@ -86,6 +111,7 @@ class OAuth2Providers {
   static function getProviders() {
     return array(
       "google",
+      "facebook",
     );
   }
 
