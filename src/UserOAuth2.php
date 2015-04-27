@@ -2,6 +2,8 @@
 
 namespace Users;
 
+use League\OAuth2\Client\Provider\ProviderInterface;
+
 /**
  * Allows users to be logged in with OAuth2.
  * Based on https://github.com/thephpleague/oauth2-client
@@ -15,7 +17,7 @@ class UserOAuth2 {
    * @return a valid {@link User}
    * @throws UserAuthenticationException if the user could not be logged in, with a reason
    */
-  static function tryLogin(\Db\Connection $db, $provider) {
+  static function tryLogin(\Db\Connection $db, OAuth2Providers $provider) {
     $user = UserOAuth2::auth($provider->getProvider());
     if (!$user) {
       throw new UserAuthenticationException("Could not login user with OAuth2.");
@@ -44,7 +46,7 @@ class UserOAuth2 {
   /**
    * Execute OAuth2 authentication and return the user.
    */
-  static function auth($provider) {
+  static function auth(ProviderInterface $provider) {
     if (!require_get("code", false)) {
       redirect($provider->getAuthorizationUrl());
       return false;
@@ -70,7 +72,7 @@ class UserOAuth2 {
    * @throws UserSignupException if the user could not be signed up, with a reason
    * @throws UserAlreadyExistsException if the user already exists in the database
    */
-  static function trySignup(\Db\Connection $db, $provider) {
+  static function trySignup(\Db\Connection $db, OAuth2Providers $provider) {
     $identity = UserOAuth2::auth($provider->getProvider());
     if (!$identity) {
       throw new UserSignupException("Could not login with OAuth2.");
@@ -123,7 +125,7 @@ class UserOAuth2 {
    * @throws UserSignupException if the user could not be signed up, with a reason
    * @throws UserAlreadyExistsException if the identity already exists in the database
    */
-  static function addIdentity(\Db\Connection $db, User $user, $provider) {
+  static function addIdentity(\Db\Connection $db, User $user, OAuth2Providers $provider) {
     if (!$user) {
       throw new \InvalidArgumentException("No user provided.");
     }

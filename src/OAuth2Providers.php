@@ -2,44 +2,55 @@
 
 namespace Users;
 
+use League\OAuth2\Client\Provider\ProviderInterface;
+
 /**
  * Provides an interface to supported OAuth2 providers.
+ * We need to provide a wrapper around this so we can map our `oauth2 provider` key (e.g. 'google'
+ * to the relevant {@link ProviderInterface} for OAuth2.)
  * TODO this could be abstracted out into component-discovery for each provider
  */
 class OAuth2Providers {
 
-  var $key;
-  var $provider;
-
-  function __construct($key, $provider) {
+  function __construct($key, ProviderInterface $provider) {
     $this->key = $key;
     $this->provider = $provider;
-  }
-
-  function getProvider() {
-    return $this->provider;
   }
 
   function getKey() {
     return $this->key;
   }
 
-  /**
-   * Get the {@link League\OAuth2\Client\Provider\Provider} for the Google
-   * authentication handler.
-   *
-   * @param $redirect the `redirectUri` to provide the provider.
-   */
-  static function google($redirect) {
-    return new OAuth2Providers("google", OAuth2Providers::loadProvider("google", $redirect));
+  function getProvider() {
+    return $this->provider;
   }
 
   /**
-   * Load the {@link AbstractProvider} with the given key, from {@link #getProviders()}.
+   * Get the {@link OAuth2Providers} for the Google
+   * authentication handler.
    *
    * @param $redirect the `redirectUri` to provide the provider.
+   * @return A {@link OAuth2Providers}
+   */
+  static function google($redirect) {
+    if (!$redirect) {
+      throw new \InvalidArgumentException("No redirect provided.");
+    }
+
+    return new OAuth2Providers('google', OAuth2Providers::loadProvider("google", $redirect));
+  }
+
+  /**
+   * Load the {@link ProviderInterface} with the given key, from {@link #getProviders()}.
+   *
+   * @param $redirect the `redirectUri` to provide the provider.
+   * @return A {@link ProviderInterface}
    */
   static function loadProvider($key, $redirect) {
+    if (!$redirect) {
+      throw new \InvalidArgumentException("No redirect provided.");
+    }
+
     switch ($key) {
       case "google":
         return new \League\OAuth2\Client\Provider\Google(array(
@@ -55,7 +66,21 @@ class OAuth2Providers {
   }
 
   /**
+   * Allows instances to be created based on {@link #getProviders()}.
+   */
+  static function createProvider($key, $redirect) {
+    switch ($key) {
+      case "google":
+        return self::google($redirect);
+
+      break;
+        throw new UserAuthenticationException("No such known OAuth2 provider '$key'");
+    }
+  }
+
+  /**
    * Get a list of all the provider keys supported by this component.
+   * @see #createProvider()
    */
   static function getProviders() {
     return array(
