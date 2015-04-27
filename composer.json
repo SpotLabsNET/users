@@ -6,7 +6,7 @@
     "soundasleep/php-helpers": "dev-master",
     "league/oauth2-client": "~0.6",
     "soundasleep/lightopenid": "~0.1",
-    "openclerk/events": "dev-master"
+    "openclerk/events": "^0.1.0"
   },
   "autoload": {
     "psr-4": {
