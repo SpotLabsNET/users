@@ -172,4 +172,18 @@ class UserOAuth2 {
     return true;
   }
 
+  /**
+   * Remove the given OAuth2 identity from the given user.
+   */
+  static function removeIdentity(\Db\Connection $db, User $user, $provider, $uid) {
+    if (!$user) {
+      throw new \InvalidArgumentException("No user provided.");
+    }
+
+    $q = $db->prepare("DELETE FROM user_oauth2_identities WHERE user_id=? AND provider=? AND uid=? LIMIT 1");
+    return $q->execute(array($user->getId(), $provider, $uid));
+
+  }
+
+
 }

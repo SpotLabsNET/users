@@ -195,8 +195,8 @@ class UserOpenID {
       throw new \InvalidArgumentException("No user provided.");
     }
 
-    $q = $db->prepare("DELETE FROM user_openid_identities WHERE identity=? LIMIT 1");
-    return $q->execute(array($openid));
+    $q = $db->prepare("DELETE FROM user_openid_identities WHERE user_id=? AND identity=? LIMIT 1");
+    return $q->execute(array($user->getId(), $openid));
   }
 
 }
