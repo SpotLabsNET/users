@@ -96,6 +96,13 @@ class User {
     }
   }
 
+  /**
+   * Login as the given user_id.
+   */
+  static function forceLogin(\Db\Connection $db, $user_id) {
+    User::$instance = User::findUser($db, $user_id);
+  }
+
   static function logout(\Db\Connection $db) {
     unset($_SESSION['user_id']);
     unset($_SESSION['user_key']);

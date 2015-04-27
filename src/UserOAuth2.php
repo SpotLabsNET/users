@@ -71,6 +71,7 @@ class UserOAuth2 {
   /**
    * @throws UserSignupException if the user could not be signed up, with a reason
    * @throws UserAlreadyExistsException if the user already exists in the database
+   * @return the created {@link User}
    */
   static function trySignup(\Db\Connection $db, OAuth2Providers $provider) {
     $identity = UserOAuth2::auth($provider->getProvider());
@@ -92,7 +93,7 @@ class UserOAuth2 {
       $q = $db->prepare("SELECT * FROM users WHERE email=? LIMIT 1");
       $q->execute(array($email));
       if ($q->fetch()) {
-        throw new UserAlreadyExistsException("That email is already in use.");
+        throw new UserAlreadyExistsException("That email '" . $email . "' is already in use.");
       }
 
     }
@@ -118,7 +119,7 @@ class UserOAuth2 {
     $q = $db->prepare("INSERT INTO user_oauth2_identities SET user_id=?, provider=?, uid=?");
     $q->execute(array($user_id, $provider->getKey(), $uid));
 
-    return true;
+    return User::findUser($db, $user_id);
   }
 
   /**

@@ -39,6 +39,7 @@ class UserPassword {
   /**
    * @throws UserSignupException if the user could not be signed up, with a reason
    * @throws UserAlreadyExistsException if the user already exists in the database
+   * @return the created {@link User}
    */
   static function trySignup(\Db\Connection $db, $email, $password) {
     if ($email === null) {
@@ -65,7 +66,7 @@ class UserPassword {
     $q = $db->prepare("INSERT INTO user_passwords SET user_id=?, password_hash=?");
     $q->execute(array($user_id, UserPassword::hash($password)));
 
-    return true;
+    return User::findUser($db, $user_id);
   }
 
   /**

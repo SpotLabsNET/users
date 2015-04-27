@@ -115,6 +115,7 @@ class UserOpenID {
   /**
    * @throws UserSignupException if the user could not be signed up, with a reason
    * @throws UserAlreadyExistsException if the identity or email already exists in the database
+   * @return the created {@link User}
    */
   static function trySignup(\Db\Connection $db, $email, $openid, $redirect) {
     if (!$redirect) {
@@ -153,7 +154,7 @@ class UserOpenID {
     $q = $db->prepare("INSERT INTO user_openid_identities SET user_id=?, identity=?");
     $q->execute(array($user_id, $light->identity));
 
-    return true;
+    return User::findUser($db, $user_id);
   }
 
   /**
