@@ -54,7 +54,7 @@ class UserOpenID {
 
           return $result;
         } else {
-          throw new UserAuthenticationException("No account for the OpenID identity '" . $light->identity . "' was found.");
+          throw new UserAuthenticationMissingAccountException("No account for the OpenID identity '" . $light->identity . "' was found.");
         }
 
       } else {

@@ -28,7 +28,7 @@ class UserPassword {
       $result->setIdentity("(password)");
       return $result;
     } else {
-      throw new UserAuthenticationException("No such email/password found");
+      throw new UserAuthenticationMissingAccountException("No such email/password found.");
     }
   }
 
