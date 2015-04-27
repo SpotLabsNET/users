@@ -56,6 +56,21 @@ class OAuth2Providers {
   }
 
   /**
+   * Get the {@link OAuth2Providers} for the Github
+   * authentication handler.
+   *
+   * @param $redirect the `redirectUri` to provide the provider.
+   * @return A {@link OAuth2Providers}
+   */
+  static function github($redirect) {
+    if (!$redirect) {
+      throw new \InvalidArgumentException("No redirect provided.");
+    }
+
+    return new OAuth2Providers('github', OAuth2Providers::loadProvider("github", $redirect));
+  }
+
+  /**
    * Load the {@link ProviderInterface} with the given key, from {@link #getProviders()}.
    *
    * @param $redirect the `redirectUri` to provide the provider.
@@ -84,6 +99,14 @@ class OAuth2Providers {
           'scopes' => array('email'),
         ));
 
+      case "github":
+        return new \League\OAuth2\Client\Provider\Github(array(
+          'clientId' =>\Openclerk\Config::get("oauth2_github_client_id"),
+          'clientSecret' => \Openclerk\Config::get("oauth2_github_client_secret"),
+          'redirectUri' => $redirect,
+          'scopes' => array('email'),
+        ));
+
       default:
         throw new UserAuthenticationException("No such known OAuth2 provider '$key'");
     }
@@ -98,6 +121,8 @@ class OAuth2Providers {
         return self::google($redirect);
       case "facebook":
         return self::facebook($redirect);
+      case "github":
+        return self::github($redirect);
 
       break;
         throw new UserAuthenticationException("No such known OAuth2 provider '$key'");
@@ -112,6 +137,7 @@ class OAuth2Providers {
     return array(
       "google",
       "facebook",
+      "github",
     );
   }
 

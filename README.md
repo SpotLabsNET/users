@@ -144,6 +144,9 @@ create a new Project, and visit *APIs & Auth*:
 For **Facebook OAuth2**, login to your [Facebook Developers Console](https://developers.facebook.com/apps/),
 create a new App, and visit the Dashboard page for this app to get your _App ID_ and _App Secret_.
 
+For **GitHub OAuth2**, [register a new GitHub application](https://github.com/settings/applications/new),
+and use the generated _Client ID_ and _Client Secret_ in your site configuration (above).
+
 ```php
 // signup
 $user = Users\UserOAuth2::trySignup(db(), Users\OAuth2Providers::google("http://localhost/register.php"));
