@@ -18,12 +18,12 @@ class UserOAuth2 {
   static function tryLogin(\Db\Connection $db, $provider) {
     $user = UserOAuth2::auth($provider->getProvider());
     if (!$user) {
-      throw new UserAuthenticationException("Could not login user with OAuth2");
+      throw new UserAuthenticationException("Could not login user with OAuth2.");
     }
 
     $uid = $user->uid;
     if (!$uid) {
-      throw new UserAuthenticationException("No UID found");
+      throw new UserAuthenticationException("No UID found.");
     }
 
     // find the user with the uid
@@ -37,7 +37,7 @@ class UserOAuth2 {
       $result->setIdentity($provider->getKey() . ":" . $uid);
       return $result;
     } else {
-      throw new UserAuthenticationException("No such " . $provider->getKey() . " user found");
+      throw new UserAuthenticationMissingAccountException("No such " . $provider->getKey() . " user found.");
     }
   }
 
@@ -51,7 +51,7 @@ class UserOAuth2 {
     } else {
       // optionally check for abuse etc
       if (!\Openclerk\Events::trigger('oauth2_auth', $provider)) {
-        throw new UserAuthenticationException("Login was cancelled by the system");
+        throw new UserAuthenticationException("Login was cancelled by the system.");
       }
 
       $token = $provider->getAccessToken('authorization_code', array(
@@ -73,13 +73,13 @@ class UserOAuth2 {
   static function trySignup(\Db\Connection $db, $provider) {
     $identity = UserOAuth2::auth($provider->getProvider());
     if (!$identity) {
-      throw new UserSignupException("Could not login with OAuth2");
+      throw new UserSignupException("Could not login with OAuth2.");
     }
 
     $email = $identity->email;
     if ($email || \Openclerk\Config::get('users_require_email', false)) {
       if (!$email) {
-        throw new UserSignupException("No email address found");
+        throw new UserSignupException("No email address found.");
       }
 
       if (!is_valid_email($email)) {
@@ -90,7 +90,7 @@ class UserOAuth2 {
       $q = $db->prepare("SELECT * FROM users WHERE email=? LIMIT 1");
       $q->execute(array($email));
       if ($q->fetch()) {
-        throw new UserAlreadyExistsException("That email is already in use");
+        throw new UserAlreadyExistsException("That email is already in use.");
       }
 
     }
@@ -104,7 +104,7 @@ class UserOAuth2 {
     $q = $db->prepare("SELECT * FROM user_oauth2_identities WHERE provider=? AND uid=? LIMIT 1");
     $q->execute(array($provider->getKey(), $uid));
     if ($q->fetch()) {
-      throw new UserAlreadyExistsException("That OAuth2 identity is already in use");
+      throw new UserAlreadyExistsException("That OAuth2 identity is already in use.");
     }
 
     // create a new user
@@ -125,24 +125,24 @@ class UserOAuth2 {
    */
   static function addIdentity(\Db\Connection $db, User $user, $provider) {
     if (!$user) {
-      throw new \InvalidArgumentException("No user provided");
+      throw new \InvalidArgumentException("No user provided.");
     }
 
     $identity = UserOAuth2::auth($provider->getProvider());
     if (!$identity) {
-      throw new UserSignupException("Could not login with OAuth2");
+      throw new UserSignupException("Could not login with OAuth2.");
     }
 
     $uid = $identity->uid;
     if (!$uid) {
-      throw new UserSignupException("No UID found");
+      throw new UserSignupException("No UID found.");
     }
 
     // does such an identity already exist?
     $q = $db->prepare("SELECT * FROM user_oauth2_identities WHERE provider=? AND uid=? LIMIT 1");
     $q->execute(array($provider->getKey(), $uid));
     if ($q->fetch()) {
-      throw new UserAlreadyExistsException("That OAuth2 identity is already in use");
+      throw new UserAlreadyExistsException("That OAuth2 identity is already in use.");
     }
 
     // create a new identity

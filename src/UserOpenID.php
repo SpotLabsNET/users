@@ -32,14 +32,14 @@ class UserOpenID {
 
     } else if ($light->mode == 'cancel') {
       // user has cancelled
-      throw new UserSignupException("User has cancelled authentication");
+      throw new UserSignupException("User has cancelled authentication.");
 
     } else {
       // otherwise login as necessary
 
       // optionally check for abuse etc
       if (!\Openclerk\Events::trigger('openid_validate', $light)) {
-        throw new UserAuthenticationException("Login was cancelled");
+        throw new UserAuthenticationException("Login was cancelled.");
       }
 
       if ($light->validate()) {
@@ -87,14 +87,14 @@ class UserOpenID {
 
     } else if ($light->mode == 'cancel') {
       // user has cancelled
-      throw new UserSignupException("User has cancelled authentication");
+      throw new UserSignupException("User has cancelled authentication.");
 
     } else {
       // otherwise login as necessary
 
       // optionally check for abuse etc
       if (!\Openclerk\Events::trigger('openid_validate', $light)) {
-        throw new UserSignupException("Login was cancelled by the system");
+        throw new UserSignupException("Login was cancelled by the system.");
       }
 
       if ($light->validate()) {
@@ -120,7 +120,7 @@ class UserOpenID {
       $q = $db->prepare("SELECT * FROM users WHERE email=? LIMIT 1");
       $q->execute(array($email));
       if ($q->fetch()) {
-        throw new UserAlreadyExistsException("That email is already in use");
+        throw new UserAlreadyExistsException("That email is already in use.");
       }
     }
 
@@ -152,7 +152,7 @@ class UserOpenID {
    */
   static function addIdentity(\Db\Connection $db, User $user, $openid, $redirect) {
     if (!$user) {
-      throw new \InvalidArgumentException("No user provided");
+      throw new \InvalidArgumentException("No user provided.");
     }
 
     $light = self::validateOpenID($openid, $redirect);

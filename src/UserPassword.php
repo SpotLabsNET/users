@@ -15,7 +15,7 @@ class UserPassword {
    */
   static function tryLogin(\Db\Connection $db, $email, $password) {
     if ($email === null) {
-      throw new UserAuthenticationException("Email required for password login");
+      throw new UserAuthenticationException("Email required for password login.");
     }
 
     // find the user with the email
@@ -42,18 +42,18 @@ class UserPassword {
    */
   static function trySignup(\Db\Connection $db, $email, $password) {
     if ($email === null) {
-      throw new UserAuthenticationException("Email required for password signup");
+      throw new UserAuthenticationException("Email required for password signup.");
     }
 
     if (!is_valid_email($email)) {
-      throw new UserAuthenticationException("That is not a valid email");
+      throw new UserAuthenticationException("That is not a valid email.");
     }
 
     // does a user already exist with this email?
     $q = $db->prepare("SELECT * FROM users WHERE email=? LIMIT 1");
     $q->execute(array($email));
     if ($q->fetch()) {
-      throw new UserAlreadyExistsException("That email is already in use");
+      throw new UserAlreadyExistsException("That email is already in use.");
     }
 
     // create a new user
@@ -77,7 +77,7 @@ class UserPassword {
     }
 
     if (!is_valid_email($email)) {
-      throw new UserPasswordException("That is not a valid email");
+      throw new UserPasswordException("That is not a valid email.");
     }
 
     // does a user exist for this email?
@@ -85,7 +85,7 @@ class UserPassword {
     $q->execute(array($email));
     $user = $q->fetch();
     if (!$user) {
-      throw new UserPasswordException("No such account exists");
+      throw new UserPasswordException("No such account exists.");
     }
 
     // is there a password user?
@@ -93,7 +93,7 @@ class UserPassword {
     $q->execute(array($user['id']));
     $user_password = $q->fetch();
     if (!$user_password) {
-      throw new UserPasswordException("That account does not have an associated password");
+      throw new UserPasswordException("That account does not have an associated password.");
     }
 
     return $user;
@@ -125,7 +125,7 @@ class UserPassword {
     $user = self::getPasswordUser($db, $email);
 
     if (!$secret) {
-      throw new UserPasswordException("No secret supplied");
+      throw new UserPasswordException("No secret supplied.");
     }
 
     $q = $db->prepare("SELECT * FROM user_passwords WHERE user_id=?");
@@ -138,10 +138,10 @@ class UserPassword {
         $q->execute(array(UserPassword::hash($new_password), $user['id']));
         return true;
       } else {
-        throw new UserPasswordException("Password request has expired");
+        throw new UserPasswordException("Password request has expired.");
       }
     } else {
-      throw new UserPasswordException("Incorrect password reset secret");
+      throw new UserPasswordException("Incorrect password reset secret.");
     }
   }
 
@@ -152,22 +152,22 @@ class UserPassword {
    */
   static function addPassword(\Db\Connection $db, User $user, $password) {
     if (!$user) {
-      throw new \InvalidArgumentException("No user provided");
+      throw new \InvalidArgumentException("No user provided.");
     }
 
     // does such a password already exist?
     $q = $db->prepare("SELECT * FROM user_passwords WHERE user_id=? LIMIT 1");
     $q->execute(array($user->getId()));
     if ($q->fetch()) {
-      throw new UserAlreadyExistsException("That account already has a password");
+      throw new UserAlreadyExistsException("That account already has a password.");
     }
 
     // does the user have an email? required
     $email = $user->getEmail();
     if (!$email) {
-      throw new UserSignupException("That account requires an email address to add a password");
+      throw new UserSignupException("That account requires an email address to add a password.");
     } else if (!is_valid_email($email)) {
-      throw new UserSignupException("That is not a valid email");
+      throw new UserSignupException("That is not a valid email.");
     }
 
     // create a new password
@@ -176,7 +176,6 @@ class UserPassword {
 
     return true;
   }
-
 
   // TODO forgotten password, etc
 
