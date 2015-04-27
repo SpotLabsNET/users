@@ -186,4 +186,16 @@ class UserOpenID {
     return $light->identity;
   }
 
+  /**
+   * Remove the given OpenID identity from the given user.
+   */
+  static function removeIdentity(\Db\Connection $db, User $user, $openid) {
+    if (!$user) {
+      throw new \InvalidArgumentException("No user provided.");
+    }
+
+    $q = $db->prepare("DELETE FROM user_openid_identities WHERE identity=? LIMIT 1");
+    return $q->execute(array($openid));
+  }
+
 }
