@@ -34,12 +34,29 @@ class UserOAuth2 {
         WHERE uid=? AND provider=? LIMIT 1");
     $q->execute(array($uid, $provider->getKey()));
 
-    if ($user = $q->fetch()) {
-      $result = new User($user);
+    if ($user_instance = $q->fetch()) {
+      $result = new User($user_instance);
       $result->setIdentity($provider->getKey() . ":" . $uid);
       return $result;
     } else {
-      throw new UserAuthenticationMissingAccountException("No such " . $provider->getKey() . " user found.");
+      // issue #266: If we are using Google, we might have an OpenID account that hasn't been connected yet,
+      // in which case we can find it here and connect it
+      if (isset($provider->getProvider()->id_token) && isset($provider->getProvider()->id_token['openid_id'])) {
+        $id_token = $provider->getProvider()->id_token;
+
+        $q = $db->prepare("SELECT * FROM user_openid_identities WHERE identity=?");
+        $q->execute(array($id_token['openid_id']));
+
+        if ($openid_identity = $q->fetch()) {
+          // create a new identity
+          $q = $db->prepare("INSERT INTO user_oauth2_identities SET user_id=?, provider=?, uid=?");
+          $q->execute(array($openid_identity['user_id'], $provider->getKey(), $uid));
+
+          return User::findUser($db, $openid_identity['user_id']);
+        }
+      }
+
+      throw new UserAuthenticationMissingAccountException("No such '" . $provider->getKey() . "' user found.");
     }
   }
 

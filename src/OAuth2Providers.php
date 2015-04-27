@@ -53,11 +53,12 @@ class OAuth2Providers {
 
     switch ($key) {
       case "google":
-        return new \League\OAuth2\Client\Provider\Google(array(
+        return new GoogleWithOpenID(array(
           'clientId' =>\Openclerk\Config::get("oauth2_google_client_id"),
           'clientSecret' => \Openclerk\Config::get("oauth2_google_client_secret"),
           'redirectUri' => $redirect,
-          'scopes' => array('email'),
+          'scopes' => array('email', 'openid'),
+          'openid.realm' => \Openclerk\Config::get('openid_host'),
         ));
 
       default:
