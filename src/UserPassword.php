@@ -177,6 +177,32 @@ class UserPassword {
     return true;
   }
 
+  /**
+   * Delete all paswords for the given user.
+   */
+  static function deletePasswords(\Db\Connection $db, User $user) {
+    if (!$user) {
+      throw new \InvalidArgumentException("No user provided.");
+    }
+
+    // does such a password already exist?
+    $q = $db->prepare("DELETE FROM user_passwords WHERE user_id=?");
+    $q->execute(array($user->getId()));
+
+    return true;
+  }
+
+  /**
+   * Change the given users' password.
+   * Removes all existing passwords and then adds a new password.
+   *
+   * @throws UserPasswordException if something went wrong
+   */
+  static function changePassword(\Db\Connection $db, User $user, $password) {
+    self::deletePasswords($db, $user);
+    return self::addPassword($db, $user, $password);
+  }
+
   // TODO forgotten password, etc
 
 }
