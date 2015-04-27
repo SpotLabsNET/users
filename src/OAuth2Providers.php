@@ -27,11 +27,18 @@ class OAuth2Providers {
   /**
    * Get the {@link League\OAuth2\Client\Provider\Provider} for the Google
    * authentication handler.
+   *
+   * @param $redirect the `redirectUri` to provide the provider.
    */
   static function google($redirect) {
     return new OAuth2Providers("google", OAuth2Providers::loadProvider("google", $redirect));
   }
 
+  /**
+   * Load the {@link AbstractProvider} with the given key, from {@link #getProviders()}.
+   *
+   * @param $redirect the `redirectUri` to provide the provider.
+   */
   static function loadProvider($key, $redirect) {
     switch ($key) {
       case "google":
@@ -45,6 +52,15 @@ class OAuth2Providers {
       default:
         throw new UserAuthenticationException("No such known OAuth2 provider '$key'");
     }
+  }
+
+  /**
+   * Get a list of all the provider keys supported by this component.
+   */
+  static function getProviders() {
+    return array(
+      "google",
+    );
   }
 
 }
