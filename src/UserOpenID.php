@@ -19,6 +19,9 @@ class UserOpenID {
     if (!is_valid_url($openid)) {
       throw new UserSignupException("That is not a valid OpenID identity.");
     }
+    if (!$redirect) {
+      throw new \InvalidArgumentException("No redirect provided.");
+    }
 
     $light = new \LightOpenID(\Openclerk\Config::get("openid_host"));
 
@@ -74,6 +77,9 @@ class UserOpenID {
     if (!is_valid_url($openid)) {
       throw new UserSignupException("That is not a valid OpenID identity.");
     }
+    if (!$redirect) {
+      throw new \InvalidArgumentException("No redirect provided.");
+    }
 
     $light = new \LightOpenID(\Openclerk\Config::get("openid_host"));
 
@@ -111,6 +117,10 @@ class UserOpenID {
    * @throws UserAlreadyExistsException if the identity or email already exists in the database
    */
   static function trySignup(\Db\Connection $db, $email, $openid, $redirect) {
+    if (!$redirect) {
+      throw new \InvalidArgumentException("No redirect provided.");
+    }
+
     if ($email || \Openclerk\Config::get('users_require_email', false)) {
       if (!is_valid_email($email)) {
         throw new UserSignupException("That is not a valid email.");
@@ -149,10 +159,15 @@ class UserOpenID {
   /**
    * @throws UserSignupException if the user could not be signed up, with a reason
    * @throws UserAlreadyExistsException if the identity already exists in the database
+   * @return the added OpenID identity
    */
   static function addIdentity(\Db\Connection $db, User $user, $openid, $redirect) {
     if (!$user) {
       throw new \InvalidArgumentException("No user provided.");
+    }
+
+    if (!$redirect) {
+      throw new \InvalidArgumentException("No redirect provided.");
     }
 
     $light = self::validateOpenID($openid, $redirect);
@@ -168,7 +183,7 @@ class UserOpenID {
     $q = $db->prepare("INSERT INTO user_openid_identities SET user_id=?, identity=?");
     $q->execute(array($user->getId(), $light->identity));
 
-    return true;
+    return $light->identity;
   }
 
 }
